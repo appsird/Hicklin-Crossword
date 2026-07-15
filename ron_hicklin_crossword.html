@@ -1,0 +1,165 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Ron Hicklin Crossword</title>
+<style>
+:root{--gold:#7a5c00;--gold2:#b8860b;--ink:#1a1a1a;--hl:#fff4cf;--hlword:#fdf6e3;--green:#0b6b3a;}
+*{box-sizing:border-box;}
+body{margin:0;background:#faf7f0;color:var(--ink);font-family:Georgia,'Times New Roman',serif;}
+header{background:linear-gradient(135deg,#2b2410,#4a3c12);color:#fdf3d0;padding:20px 24px;}
+header h1{margin:0;font-family:Arial,Helvetica,sans-serif;font-size:22px;letter-spacing:.02em;}
+header p{margin:6px 0 0;font-family:Arial;font-size:13px;color:#e6d59a;max-width:760px;}
+.wrap{display:flex;flex-wrap:wrap;gap:26px;padding:22px;align-items:flex-start;}
+.gridpanel{flex:0 0 auto;}
+.toolbar{margin:0 0 12px;display:flex;gap:8px;flex-wrap:wrap;}
+button{font-family:Arial;font-size:13px;padding:8px 14px;border:1.5px solid var(--gold);background:#fff;color:var(--gold);border-radius:7px;cursor:pointer;font-weight:600;}
+button:hover{background:var(--gold);color:#fff;}
+button.warn{border-color:#a33;color:#a33;}
+button.warn:hover{background:#a33;color:#fff;}
+table{border-collapse:collapse;}
+td{width:34px;height:34px;padding:0;position:relative;border:1px solid #cbb98a;}
+td.block{border:none;background:transparent;}
+td .num{position:absolute;top:1px;left:2px;font-size:9px;font-family:Arial;color:#555;pointer-events:none;}
+td input{width:100%;height:100%;border:0;text-align:center;font-size:18px;font-family:Arial;font-weight:700;text-transform:uppercase;background:#fff;color:var(--ink);caret-color:var(--gold2);}
+td input:focus{outline:none;}
+td.cur input{background:var(--hl);}
+td.word input{background:var(--hlword);}
+td.correct input{color:var(--green);}
+td.wrong input{color:#b00;}
+.clues{flex:1 1 340px;min-width:300px;display:flex;gap:30px;flex-wrap:wrap;}
+.cluecol{flex:1 1 240px;min-width:230px;}
+h2{font-family:Arial;font-size:14px;letter-spacing:.06em;text-transform:uppercase;border-bottom:2px solid var(--gold);padding-bottom:5px;color:var(--gold);}
+ol{list-style:none;padding:0;margin:0;}
+li{font-size:13.5px;line-height:1.45;margin-bottom:8px;padding:4px 6px;border-radius:5px;cursor:pointer;}
+li:hover{background:#f1e9d2;}
+li.active{background:var(--hl);}
+li .n{font-weight:bold;color:var(--gold);}
+.msg{font-family:Arial;font-size:13px;color:var(--green);min-height:18px;margin-top:6px;font-weight:600;}
+footer{font-family:Arial;font-size:11px;color:#999;padding:8px 24px 26px;}
+</style></head><body>
+<header>
+<h1>&#9835; The Ron Hicklin Crossword</h1>
+<p>Ron Hicklin was one of the most-heard voices you've never heard of &mdash; a session tenor and vocal contractor whose singers powered TV themes, movie scores, hit records, and jingles for decades. Fill in the grid below. Multi-word answers are typed without spaces.</p>
+</header>
+<div class="wrap">
+  <div class="gridpanel">
+    <div class="toolbar">
+      <button onclick="check()">Check answers</button>
+      <button onclick="clearWrong()">Clear mistakes</button>
+      <button class="warn" onclick="clearAll()">Clear all</button>
+    </div>
+    <div id="grid"></div>
+    <div class="msg" id="msg"></div>
+  </div>
+  <div class="clues">
+    <div class="cluecol"><h2>Across</h2><ol id="across"></ol></div>
+    <div class="cluecol"><h2>Down</h2><ol id="down"></ol></div>
+  </div>
+</div>
+<footer>Based on the Wikipedia article &ldquo;The Ron Hicklin Singers.&rdquo; A separate answer key is provided.</footer>
+<script>
+const DATA = {"H": 31, "W": 20, "cells": [[null, null, null, null, null, null, "G", null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, "R", null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, "H", "I", "C", "K", "L", "I", "N", null, null, null, null, null, null, null, null], [null, null, null, null, null, null, "N", null, null, null, null, null, null, null, null, null, null, null, null, null], [null, null, null, null, "B", null, "C", "A", "P", "I", "T", "O", "L", null, null, null, "F", null, "V", null], [null, null, null, "M", "A", "S", "H", null, null, null, null, null, null, "S", null, null, "L", null, "O", null], [null, "F", null, null, "H", null, null, null, null, null, null, null, null, "I", "N", "D", "I", "A", "N", null], [null, "L", null, null, "L", null, null, "H", null, "P", null, null, null, "N", null, null, "P", null, "O", null], ["W", "O", "N", "D", "E", "R", "W", "O", "M", "A", "N", null, null, "A", null, null, "P", null, "R", null], [null, "W", null, null, "R", null, null, "O", null, "R", null, null, null, "T", null, null, "E", null, "E", null], [null, "E", null, "O", null, null, null, "K", null, "T", "E", "N", "O", "R", null, null, "R", null, null, null], ["G", "R", "E", "A", "S", "E", null, null, null, "R", null, null, null, "A", null, "W", null, null, null, null], [null, "S", null, "H", null, null, "T", null, null, "I", null, null, null, null, null, "H", null, null, null, null], [null, null, null, "U", null, null, "H", null, null, "D", null, "C", null, null, null, "E", null, null, null, null], [null, null, null, null, null, null, "U", null, null, "G", "L", "O", "R", "Y", null, "A", null, null, null, null], [null, null, "G", "A", "T", "O", "R", "A", "D", "E", null, "N", null, "O", null, "T", null, null, "C", null], [null, null, null, null, null, null, "L", null, null, null, null, "T", "R", "U", "D", "I", null, null, "H", null], [null, null, "B", null, null, "C", null, null, null, null, null, "R", null, "N", null, "E", null, null, "I", null], [null, null, "A", null, null, "A", "R", "I", "Z", "O", "N", "A", null, "G", null, "S", null, null, "P", null], ["D", "A", "T", "S", "U", "N", null, null, null, null, null, "C", null, "G", null, null, null, null, "M", null], [null, null, "M", null, null, "D", null, "G", "H", "O", "S", "T", null, "I", null, null, null, null, "U", null], [null, "S", "A", "L", "L", "Y", null, null, null, null, null, "O", null, "R", "A", "I", "S", "I", "N", "S"], [null, null, "N", null, null, "M", null, null, "C", "H", "E", "R", null, "L", null, null, null, null, "K", null], [null, null, null, null, null, "A", null, null, null, "A", null, null, null, null, null, null, null, null, "S", null], [null, null, "Q", "U", "I", "N", "C", "Y", null, "P", "R", "E", "C", "I", "O", "U", "S", null, null, null], [null, null, null, null, null, null, null, null, null, "P", null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, "Y", null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, null, "D", null, null, null, null, null, null, null, null, null, null], [null, null, null, null, null, null, null, null, "K", "A", "W", "A", "S", "A", "K", "I", null, null, null, null], [null, null, null, null, null, null, null, null, null, "Y", null, null, null, null, null, null, null, null, null, null], [null, null, null, "M", "O", "N", "K", "E", "E", "S", null, null, null, null, null, null, null, null, null, null]], "numbers": {"22,8": 32, "21,13": 31, "4,6": 4, "8,0": 13, "5,13": 8, "19,0": 28, "14,13": 21, "30,3": 37, "4,18": 6, "10,3": 14, "10,9": 15, "24,2": 34, "2,5": 2, "15,2": 22, "13,11": 19, "7,7": 11, "20,7": 29, "12,6": 18, "14,9": 20, "17,2": 25, "5,3": 7, "17,5": 26, "28,8": 36, "6,1": 9, "7,9": 12, "6,13": 10, "22,9": 33, "4,4": 3, "4,16": 5, "11,0": 16, "0,6": 1, "24,9": 35, "11,15": 17, "18,5": 27, "15,18": 23, "16,11": 24, "21,1": 30}, "across": [{"num": 2, "row": 2, "col": 5, "dir": "H", "answer": "HICKLIN", "clue": "Surname of Ron, the session-singing legend this puzzle celebrates"}, {"num": 4, "row": 4, "col": 6, "dir": "H", "answer": "CAPITOL", "clue": "Iconic tower-shaped record label the singers worked for"}, {"num": 7, "row": 5, "col": 3, "dir": "H", "answer": "MASH", "clue": "Film and TV theme 'Suicide Is Painless' the group recorded"}, {"num": 10, "row": 6, "col": 13, "dir": "H", "answer": "INDIAN", "clue": "'___ Reservation,' the Paul Revere & the Raiders gold hit"}, {"num": 13, "row": 8, "col": 0, "dir": "H", "answer": "WONDERWOMAN", "clue": "TV heroine whose season-2 theme featured John Bahler (two words)"}, {"num": 15, "row": 10, "col": 9, "dir": "H", "answer": "TENOR", "clue": "Ron's vocal part in the group"}, {"num": 16, "row": 11, "col": 0, "dir": "H", "answer": "GREASE", "clue": "8x-platinum 1978 movie musical soundtrack the singers appear on"}, {"num": 20, "row": 14, "col": 9, "dir": "H", "answer": "GLORY", "clue": "James Horner Civil War film the group sang on"}, {"num": 22, "row": 15, "col": 2, "dir": "H", "answer": "GATORADE", "clue": "'Thirst Aid' sports-drink commercial"}, {"num": 24, "row": 16, "col": 11, "dir": "H", "answer": "TRUDI", "clue": "Ron Hicklin's wife"}, {"num": 27, "row": 18, "col": 5, "dir": "H", "answer": "ARIZONA", "clue": "Mark Lindsay gold single featuring the group"}, {"num": 28, "row": 19, "col": 0, "dir": "H", "answer": "DATSUN", "clue": "'Drive a ___, then Decide' car-ad jingle"}, {"num": 29, "row": 20, "col": 7, "dir": "H", "answer": "GHOST", "clue": "Type of uncredited singer Ron often was, providing voices heard but not seen"}, {"num": 30, "row": 21, "col": 1, "dir": "H", "answer": "SALLY", "clue": "Soprano Stevens, first name, of the group"}, {"num": 31, "row": 21, "col": 13, "dir": "H", "answer": "RAISINS", "clue": "California ___, the claymation grapes whose 'Yum Yum' jingle won two Clios"}, {"num": 32, "row": 22, "col": 8, "dir": "H", "answer": "CHER", "clue": "Singer of 'Dark Lady,' backed by the group"}, {"num": 34, "row": 24, "col": 2, "dir": "H", "answer": "QUINCY", "clue": "___ Jones, whom Tom Bahler assisted on 'We Are the World'"}, {"num": 35, "row": 24, "col": 9, "dir": "H", "answer": "PRECIOUS", "clue": "'___ and Few,' the Climax No. 1 the singers backed"}, {"num": 36, "row": 28, "col": 8, "dir": "H", "answer": "KAWASAKI", "clue": "'Let the Good Times Roll' motorcycle-brand jingle"}, {"num": 37, "row": 30, "col": 3, "dir": "H", "answer": "MONKEES", "clue": "Made-for-TV band whose platinum albums used the studio singers"}], "down": [{"num": 1, "row": 0, "col": 6, "dir": "V", "answer": "GRINCH", "clue": "Christmas villain of the 'You're a Mean One' song Ravenscroft famously sang"}, {"num": 3, "row": 4, "col": 4, "dir": "V", "answer": "BAHLER", "clue": "Surname of brothers Tom and John in the group"}, {"num": 5, "row": 4, "col": 16, "dir": "V", "answer": "FLIPPER", "clue": "TV theme about a certain dolphin, sung by the group"}, {"num": 6, "row": 4, "col": 18, "dir": "V", "answer": "VONORE", "clue": "Tennessee town where Ron lived in retirement"}, {"num": 8, "row": 5, "col": 13, "dir": "V", "answer": "SINATRA", "clue": "Frank whose 'Trilogy' album used the singers"}, {"num": 9, "row": 6, "col": 1, "dir": "V", "answer": "FLOWERS", "clue": "Neil Diamond & Barbra duet 'You Don't Bring Me ___'"}, {"num": 11, "row": 7, "col": 7, "dir": "V", "answer": "HOOK", "clue": "John Williams-scored Peter Pan film the choir sang on"}, {"num": 12, "row": 7, "col": 9, "dir": "V", "answer": "PARTRIDGE", "clue": "TV family whose background vocals (and 'I Think I Love You') Ron's group sang"}, {"num": 14, "row": 10, "col": 3, "dir": "V", "answer": "OAHU", "clue": "Hawaiian island (Ko Olina) where Ron also resided"}, {"num": 17, "row": 11, "col": 15, "dir": "V", "answer": "WHEATIES", "clue": "Cereal whose Clio-winning 'Big Boys Eat' jingle the group sang"}, {"num": 18, "row": 12, "col": 6, "dir": "V", "answer": "THURL", "clue": "First name of Ravenscroft, the bass who voiced Tony the Tiger"}, {"num": 19, "row": 13, "col": 11, "dir": "V", "answer": "CONTRACTOR", "clue": "Ron's behind-the-scenes job: the ___ who hired and organized the studio singers"}, {"num": 21, "row": 14, "col": 13, "dir": "V", "answer": "YOUNGGIRL", "clue": "Gary Puckett & the Union Gap hit backed by the singers (two words)"}, {"num": 23, "row": 15, "col": 18, "dir": "V", "answer": "CHIPMUNKS", "clue": "Cartoon trio Alvin & the ___, whose voices Ron was part of for four decades"}, {"num": 25, "row": 17, "col": 2, "dir": "V", "answer": "BATMAN", "clue": "1960s TV superhero whose shouted opening theme the singers recorded"}, {"num": 26, "row": 17, "col": 5, "dir": "V", "answer": "CANDYMAN", "clue": "Sammy Davis Jr. No. 1 hit backed by Ron's singers (two words)"}, {"num": 33, "row": 22, "col": 9, "dir": "V", "answer": "HAPPYDAYS", "clue": "Sitcom theme (Jim Haas on lead) set in 1950s Milwaukee (two words)"}]};
+const H=DATA.H, W=DATA.W, cells=DATA.cells;
+const numbers={}; for(const k in DATA.numbers){numbers[k]=DATA.numbers[k];}
+const inputs={}; // "r,c"->input
+let cur={r:null,c:null,dir:'H'};
+
+function keyOf(r,c){return r+","+c;}
+function entryAt(r,c,dir){
+  const list = dir==='H'?DATA.across:DATA.down;
+  for(const e of list){
+    if(dir==='H' && e.row===r && c>=e.col && c<e.col+e.answer.length) return e;
+    if(dir==='V' && e.col===c && r>=e.row && r<e.row+e.answer.length) return e;
+  }
+  return null;
+}
+function cellsOf(e){
+  const arr=[];
+  for(let i=0;i<e.answer.length;i++){
+    arr.push(e.dir==='H'?keyOf(e.row,e.col+i):keyOf(e.row+i,e.col));
+  }
+  return arr;
+}
+function build(){
+  let t='<table>';
+  for(let r=0;r<H;r++){t+='<tr>';
+    for(let c=0;c<W;c++){
+      if(cells[r][c]===null){t+='<td class="block"></td>';continue;}
+      const num=numbers[keyOf(r,c)];
+      t+=`<td data-r="${r}" data-c="${c}">${num?`<span class="num">${num}</span>`:''}<input maxlength="1" data-r="${r}" data-c="${c}"></td>`;
+    }
+    t+='</tr>';
+  }
+  t+='</table>';
+  document.getElementById('grid').innerHTML=t;
+  document.querySelectorAll('#grid input').forEach(inp=>{
+    const r=+inp.dataset.r,c=+inp.dataset.c;
+    inputs[keyOf(r,c)]=inp;
+    inp.addEventListener('focus',()=>{cur.r=r;cur.c=c;highlight();});
+    inp.addEventListener('keydown',onKey);
+    inp.addEventListener('input',onInput);
+    inp.addEventListener('dblclick',()=>{cur.dir=cur.dir==='H'?'V':'H';highlight();});
+  });
+}
+function highlight(){
+  document.querySelectorAll('#grid td').forEach(td=>td.classList.remove('cur','word'));
+  document.querySelectorAll('#across li,#down li').forEach(li=>li.classList.remove('active'));
+  if(cur.r===null)return;
+  let e=entryAt(cur.r,cur.c,cur.dir)||entryAt(cur.r,cur.c,cur.dir==='H'?'V':'H');
+  if(e){cur.dir=e.dir;
+    for(const k of cellsOf(e)){const inp=inputs[k];if(inp)inp.parentElement.classList.add('word');}
+    const li=document.getElementById((e.dir==='H'?'a':'d')+e.num);if(li)li.classList.add('active');
+  }
+  const cell=inputs[keyOf(cur.r,cur.c)];if(cell)cell.parentElement.classList.add('cur');
+}
+function move(dr,dc){
+  let r=cur.r+dr,c=cur.c+dc;
+  while(r>=0&&r<H&&c>=0&&c<W){
+    const inp=inputs[keyOf(r,c)];
+    if(inp){inp.focus();return;}
+    r+=dr;c+=dc;
+  }
+}
+function onKey(ev){
+  const r=cur.r,c=cur.c;
+  if(ev.key==='ArrowRight'){cur.dir='H';move(0,1);ev.preventDefault();}
+  else if(ev.key==='ArrowLeft'){cur.dir='H';move(0,-1);ev.preventDefault();}
+  else if(ev.key==='ArrowDown'){cur.dir='V';move(1,0);ev.preventDefault();}
+  else if(ev.key==='ArrowUp'){cur.dir='V';move(-1,0);ev.preventDefault();}
+  else if(ev.key==='Backspace'){
+    const inp=inputs[keyOf(r,c)];
+    if(inp.value){inp.value='';}
+    else{cur.dir==='H'?move(0,-1):move(-1,0);}
+    ev.preventDefault();
+  }
+  else if(ev.key===' '){cur.dir=cur.dir==='H'?'V':'H';highlight();ev.preventDefault();}
+}
+function onInput(ev){
+  const inp=ev.target;
+  inp.value=inp.value.toUpperCase().replace(/[^A-Z]/g,'');
+  inp.parentElement.classList.remove('correct','wrong');
+  if(inp.value){cur.dir==='H'?move(0,1):move(1,0);}
+}
+function check(){
+  let filled=0,correct=0,total=0;
+  for(const k in inputs){
+    const [r,c]=k.split(',').map(Number);
+    const inp=inputs[k];total++;
+    inp.parentElement.classList.remove('correct','wrong');
+    if(!inp.value)continue;filled++;
+    if(inp.value===cells[r][c]){inp.parentElement.classList.add('correct');correct++;}
+    else inp.parentElement.classList.add('wrong');
+  }
+  const msg=document.getElementById('msg');
+  if(correct===total){msg.style.color='#0b6b3a';msg.textContent='&#127881; Perfect! Every square is correct.';msg.innerHTML='⭐ Perfect &mdash; every square is correct!';}
+  else{msg.style.color=filled===correct?'#0b6b3a':'#a33';msg.textContent=`${correct}/${total} squares correct, ${filled-correct} wrong, ${total-filled} blank.`;}
+}
+function clearWrong(){document.querySelectorAll('#grid td.wrong').forEach(td=>{td.querySelector('input').value='';td.classList.remove('wrong');});document.getElementById('msg').textContent='';}
+function clearAll(){for(const k in inputs){inputs[k].value='';inputs[k].parentElement.classList.remove('correct','wrong');}document.getElementById('msg').textContent='';}
+function buildClues(){
+  const mk=(e,pfx)=>`<li id="${pfx}${e.num}" onclick="goClue(${e.row},${e.col},'${e.dir}')"><span class="n">${e.num}.</span> ${e.clue}</li>`;
+  document.getElementById('across').innerHTML=DATA.across.map(e=>mk(e,'a')).join('');
+  document.getElementById('down').innerHTML=DATA.down.map(e=>mk(e,'d')).join('');
+}
+function goClue(r,c,dir){cur.dir=dir;const inp=inputs[keyOf(r,c)];if(inp)inp.focus();}
+build();buildClues();
+</script></body></html>
