@@ -35,10 +35,33 @@ li.active{background:var(--hl);}
 li .n{font-weight:bold;color:var(--gold);}
 .msg{font-family:Arial;font-size:13px;color:var(--green);min-height:18px;margin-top:6px;font-weight:600;}
 footer{font-family:Arial;font-size:11px;color:#999;padding:8px 24px 26px;}
+details.about{margin:14px 0 0;max-width:820px;background:rgba(255,255,255,.06);border:1px solid rgba(253,243,208,.25);border-radius:9px;}
+details.about>summary{font-family:Arial;font-size:13px;font-weight:700;color:#fdf3d0;cursor:pointer;padding:11px 15px;list-style:none;}
+details.about>summary::-webkit-details-marker{display:none;}
+details.about>summary::before{content:'\25B8';margin-right:9px;color:#e6d59a;display:inline-block;transition:transform .15s;}
+details.about[open]>summary::before{transform:rotate(90deg);}
+.about-body{padding:2px 16px 16px;font-family:Arial;font-size:13px;line-height:1.55;color:#efe4bf;}
+.about-body p{margin:0 0 11px;}
+.about-body h3{font-family:Arial;font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:#f2d98a;margin:16px 0 6px;}
+.about-body a{color:#ffd97a;}
+.about-body em{color:#f3e9c8;}
+.about-body strong{color:#fff5da;}
 </style></head><body>
 <header>
 <h1>&#9835; The Ron Hicklin Crossword</h1>
-<p>Ron Hicklin was one of the most-heard voices you've never heard of &mdash; a session tenor and vocal contractor whose singers powered TV themes, movie scores, hit records, and jingles for decades. Fill in the grid below. Multi-word answers are typed without spaces.</p>
+<p>Ron Hicklin was one of the most-heard voices you've never heard of &mdash; a session tenor and vocal contractor whose singers powered TV themes, movie scores, hit records, and jingles for decades. Fill in the grid below; multi-word answers are typed without spaces.</p>
+<details class="about">
+<summary>About this puzzle &amp; how to play</summary>
+<div class="about-body">
+<p>An interactive tribute to <strong>Ron Hicklin</strong> &mdash; one of the most-heard voices you've never heard of. For decades, Ron worked as a session tenor and vocal contractor in Los Angeles, quietly assembling and leading the studio singers behind an astonishing amount of American pop culture. If you grew up with a radio or a television, you've heard his work.</p>
+<p>This puzzle celebrates the sweep of that career across <strong>37 clues</strong>. Solvers will trace his path through the TV themes his singers powered &mdash; <em>The Partridge Family</em>, <em>Batman</em>, <em>Happy Days</em>, <em>Wonder Woman</em>, <em>Flipper</em> &mdash; and the film scores they lent their voices to, from <em>M*A*S*H</em> to <em>Glory</em> to <em>Hook</em>. There are the hit records (Gary Puckett, Sammy Davis Jr., Mark Lindsay, Cher, Neil Diamond, the Monkees, <em>Grease</em>), the unforgettable jingles (Kawasaki, Wheaties, Gatorade, McDonald's, the California Raisins), and the collaborators who shared the booth, including the B&auml;hler brothers and Thurl Ravenscroft, the booming bass behind Tony the Tiger. Four decades of Chipmunks are in here too.</p>
+<h3>How to play</h3>
+<p>Click any square or clue to begin, then type your answers. Use the arrow keys to move around the grid, and press the spacebar to switch between Across and Down. Multi-word answers are entered without spaces (so &ldquo;Young Girl&rdquo; becomes YOUNGGIRL). When you're ready, hit <strong>Check answers</strong> to see how you did &mdash; correct letters turn green, and you can clear mistakes and keep going.</p>
+<p>The whole thing runs right in your browser. There's nothing to install and nothing to sign up for, so it works on any computer, tablet, or phone.</p>
+<p>Facts and credits are drawn from the Wikipedia article <a href="https://en.wikipedia.org/wiki/The_Ron_Hicklin_Singers" target="_blank" rel="noopener">&ldquo;The Ron Hicklin Singers.&rdquo;</a></p>
+<p><em>Enjoy the puzzle &mdash; and the next time a familiar song comes on, listen for the voices in the background. One of them might be Ron.</em></p>
+</div>
+</details>
 </header>
 <div class="wrap">
   <div class="gridpanel">
